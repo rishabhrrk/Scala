@@ -10,7 +10,7 @@ import org.apache.log4j._
     val petid = record(0)
     val petname = record(1)
     val owner = record(3)
-    (owner,(petname,petid))
+    (owner,(petname))
   }
   
   def owner(line:String)={
@@ -30,6 +30,13 @@ import org.apache.log4j._
     //val pet_pair = pet_line.map(x=> (x._3,(x._2,x._1)))
     val owner_line = owner_lines.map(owner)
     //val owner_pair = owner_line.map(x=> (x._1,x._2))
-    pet_line.join(owner_line).foreach(println)  
+    val result = pet_line.join(owner_line)
+    val desired = result.map(x=>(x._2)).filter(x=>x._2._1!="Owner Name")
+    val fin = desired.collect()
+    for(f <- fin.sorted){
+      val ownerid = f._1
+      val joined = f._2
+      println(s"$joined")
+    }
   }
 }
