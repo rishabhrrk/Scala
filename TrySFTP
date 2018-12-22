@@ -1,0 +1,28 @@
+package com.rishabhrrk.spark
+
+import org.apache.spark._
+import org.apache.spark.SparkContext._
+import org.apache.spark.sql._
+import org.apache.log4j._
+import com.springml.spark.sftp._
+
+object TrySFTP {
+  def main(args: Array[String]){
+    val spark = SparkSession
+      .builder
+      .appName("TrySFTP")
+      .master("local[*]")
+      .config("spark.sql.warehouse.dir", "file:///C:/Temp") // Necessary to work around a Windows bug in Spark 2.0.0; omit if you're not on Windows.
+      .getOrCreate()
+      
+    import spark.implicits._
+    
+    val df = spark.read.format("com.springml.spark.sftp").option("host", "<url_FTP>").option("username", "<UserName>")
+    .option("password", "<Password>").option("fileType", "csv").option("delimiter", ",").option("inferSchema", "true")
+    .load("<Path>/<FileName>.csv")
+    
+    df.show(10)
+    df.write.csv("../<Output_filename>.csv")
+    spark.stop()
+  }
+}
